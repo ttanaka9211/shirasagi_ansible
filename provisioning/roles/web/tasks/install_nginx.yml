@@ -1,0 +1,79 @@
+---
+- name: Repo nginx
+  template:
+    src: nginx.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+
+- name: Install nginx
+  dnf:
+    name: nginx
+    disablerepo: AppStream
+    state: present
+
+- name: Transfer nginx.conf
+  template:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- name: Transfer config.j2
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/conf.d/{{ item | regex_replace('^.*conf.d/(.*).j2$','\\1') }}"
+  with_fileglob:
+    - "../templates/conf.d/*.j2"
+
+- name: Create directory
+  file:
+    path: "{{ item.path }}"
+    state: directory
+  loop:
+    - path: "/etc/nginx/conf.d/common"
+    - path: "/etc/nginx/conf.d/server"
+    - path: "/etc/nginx/conf.d/pwd"
+
+- name: Transfer conf.d/common.j2
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/conf.d/common/{{ item | regex_replace('^.*common/(.*).j2$','\\1') }}"
+  with_fileglob:
+    - "../templates/conf.d/common/*.j2"
+
+- name: Transfer conf.d/server.j2
+  template:
+    src: "{{ item }}"
+    dest: "/etc/nginx/conf.d/server/{{ item | regex_replace('^.*server/(.*).j2$','\\1') }}"
+  with_fileglob:
+    - "../templates/conf.d/server/*.j2"
+
+      #- name: Transfer botdrop.conf.j2
+      #  template:
+      #    src: botdrop.conf.j2
+      #    dest: /etc/nginx/conf.d/common/botdrop.conf
+      #  become: yes
+      #  notify: restart nginx
+      #
+      #- name: Transfer drop.conf.j2
+      #  template:
+      #    src: drop.conf.j2
+      #    dest: /etc/nginx/conf.d/common/drop.conf
+      #  become: yes
+      #  notify: restart nginx
+      #
+      #- name: Transfer security.conf.j2
+      #  template:
+      #    src: security.conf.j2
+      #    dest: /etc/nginx/conf.d/common/security.conf
+      #  become: yes
+      #  notify: restart nginx
+      #
+      #- name: Transfer ss.conf.j2
+      #  template:
+      #    src: ss.conf.j2
+      #    dest: /etc/nginx/conf.d/server/ss.conf
+      #  become: yes
+      #  notify: restart nginx
+- name: Start nginx
+  systemd: 
+    name: nginx 
+    state: started
+    enabled: yes

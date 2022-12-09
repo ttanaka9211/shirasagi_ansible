@@ -1,0 +1,46 @@
+include conf.d/common/drop.conf;
+
+error_page 404 /404.html;
+
+# Access ctrl.
+satisfy any;
+allow 127.0.0.1;
+allow 153.122.118.99;
+deny all;
+auth_basic "secret area";
+auth_basic_user_file "/etc/nginx/conf.d/pwd/.htpasswd";
+
+location @app {
+    include conf.d/header.conf;
+    if ($request_filename ~ .*\.(ico|gif|jpe?g|png|css|js)$) { access_log off; }
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header X-Accel-Mapping /var/www/shirasagi/=/private_files/;
+    proxy_intercept_errors on;
+
+}
+location / {
+    include conf.d/common/security.conf;
+    try_files $uri $uri/index.html @app;
+}
+location ^~ /assets/ {
+    include conf.d/common/security.conf;
+    root /var/www/shirasagi/public/;
+    expires 1h;
+    access_log off;
+}
+location ^~ /.mypage/ {
+    auth_basic "secret area";
+    auth_basic_user_file "/etc/nginx/conf.d/pwd/.htpasswd";
+    try_files $uri @app;
+}
+location ^~ /private_files/ {
+    internal;
+    alias /var/www/shirasagi/;
+}
+location ~* \.(ico|css|js|gif|jpe?g|png)$ {
+    include conf.d/common/security.conf;
+    expires 2h;
+    access_log off;
+    log_not_found off;
+    try_files $uri @app;
+}

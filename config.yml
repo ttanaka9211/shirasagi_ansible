@@ -1,0 +1,23 @@
+vagrant_box: ttanaka9211/almalinux8
+vagrant_box_version: 8.7.20221112
+
+# 仮想マシン名
+vagrant_hostname: sample.test
+
+# 仮想マシンのIPアドレス
+vagrant_ip: 192.168.56.100
+
+# ホストマシンと仮想マシンのフォルダ共有
+vagrant_synced_folder:
+  local_path: ../.
+  destination: /data
+
+# nginxのポート番号の、ホストと仮想マシン間の変換
+vagrant_forwarded_ports:
+  # nginx
+  - guest: 80
+    host: 8880
+
+# メモリとCPUの設定
+vagrant_memory: 613
+vagrant_cpus: 1

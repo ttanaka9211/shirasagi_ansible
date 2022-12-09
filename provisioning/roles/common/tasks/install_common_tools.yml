@@ -1,0 +1,20 @@
+---
+- name: Upgrade all packages
+  ansible.builtin.yum:
+    name: '*'
+    state: latest
+- name: Install the 'Development tools' package group
+  ansible.builtin.yum:
+    name: "@Development tools"
+    state: present
+- name: Install a list of packages with a list variable
+  ansible.builtin.yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - postfix
+    - rsyslog
+    - vim 
+    - rsync
+    

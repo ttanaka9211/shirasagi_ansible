@@ -1,0 +1,61 @@
+--- # user setup
+# デフォルトユーザ用グループの追加
+- name: Add group for default user
+  group:
+    name: "{{ default_user.group }}"
+    state: present
+
+# デフォルトユーザを追加
+- name: Add user default user
+  user:
+    name: "{{ default_user.name }}"
+    uid: "{{ default_user.uid }}"
+    group: "{{ default_user.group }}"
+    password: "{{ default_user.password}}"
+    state: present
+# デフォルトユーザをsudo可能に
+- name: Add default user to sudoers
+  template:
+    src: default_user_sudoers.j2
+    dest: /etc/sudoers.d/{{ default_user.name }}
+    owner: root
+    group: root
+    mode: '0644'
+
+# 以下、packerの場合
+- block:
+  # デフォルトユーザの.sshディレクトリを作成
+  - name: create .ssh directory for default user
+    file:
+      path: "/home/{{ default_user.name }}/.ssh"
+      state: directory
+      owner: "{{ default_user.name }}"
+      group: "{{ default_user.group }}"
+      mode: 0700
+
+  # ec2-userの公開鍵をデフォルトユーザに追加
+  - name: check authorized_keys for default user
+    stat: path="/home/{{ default_user.name }}/.ssh/authorized_keys"
+    register: default_user_authorized_keys
+
+  # EC2ではEC2インスタンス生成時にキーペアを指定します。指定したキーはec2-userに配置されるため、作成したユーザにもコピー
+  - name: copy authorized_keys for default user from ec2-user
+    shell: "cp -p /home/ec2-user/.ssh/authorized_keys /home/{{ default_user.name }}/.ssh/authorized_keys"
+    when: not default_user_authorized_keys.stat.exists
+
+  # キーを使用可能に
+  - name: chown/chmod authorized_keys for default user
+    file:
+      path: "/home/{{ default_user.name }}/.ssh/authorized_keys"
+      owner: "{{ default_user.name }}"
+      group: "{{ default_user.group}}"
+      mode: '0600'
+
+  # セキュリティ上、ec2-userの接続禁止
+  - name: deny ec2-user on ssh connection
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      state: present
+      line: 'DenyUsers ec2-user'
+
+  when: not is_vagrant

@@ -1,0 +1,5 @@
+---
+nginx_version: 1.12
+src_conf.d_path: conf.d/
+src_common_path: conf.d/common/
+src_sever_path: conf.d/server/

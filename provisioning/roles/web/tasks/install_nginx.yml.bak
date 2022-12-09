@@ -1,0 +1,77 @@
+- name: Add repository
+  template:
+    src: nginx.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+- name: Install nginx
+  dnf:
+    name: nginx
+    disablerepo: AppStream
+    state: latest
+      #- name: nginx installed
+      #  ansible.builtin.yum:
+      #    name: nginx
+      #    state: latest
+# nginxの設定ファイルを配置
+- name: Put nginx.conf template
+  template:
+    dest: /etc/nginx/nginx.conf
+    src: nginx.conf.j2
+    owner: root
+    group: root
+    mode: 0644
+
+# nginxのvirtualhost用設定ファイルを配置
+- name: Put virtual.conf template
+  template:
+    dest: /etc/nginx/conf.d/virtual.conf
+    src: virtual.conf.j2
+    owner: root
+    group: root
+    mode: 0644
+
+# 一度nginxを起動（ログファイル生成のため）
+- name: Start nginx
+  systemd: name=nginx state=started enabled=yes
+  changed_when: False
+
+    ## 一度nginxを停止
+    #- name: Stop nginx
+    #  systemd: name=nginx state=stopped
+    #  changed_when: False
+
+    ## ログ出力ディレクトリ、ログ・ファイル等のパーミッションを変更
+    #- name: chown /var/log/nginx for default user
+    #  file:
+    #    path: "/var/log/nginx"
+    #    owner: "{{ default_user.name }}"
+    #    group: "{{ default_user.group}}"
+    #    mode: '0700'
+    #- name: chown /var/log/nginx/access.log for default user
+    #  file:
+    #    path: "/var/log/nginx/access.log"
+    #    owner: "{{ default_user.name }}"
+    #    group: "{{ default_user.group}}"
+    #    mode: '0600'
+    #- name: chown /var/log/nginx/error.log for default user
+    #  file:
+    #    path: "/var/log/nginx/error.log"
+    #    owner: "{{ default_user.name }}"
+    #    group: "{{ default_user.group}}"
+    #    mode: '0600'
+    #- name: chown /var/lib/nginx for default user
+    #  file:
+    #    path: "/var/lib/nginx"
+    #    owner: "{{ default_user.name }}"
+    #    group: "{{ default_user.group}}"
+    #    mode: '0700'
+    #- name: chown /var/lib/nginx/tmp for default user
+    #  file:
+    #    path: "/var/lib/nginx/tmp"
+    #    owner: "{{ default_user.name }}"
+    #    group: "{{ default_user.group}}"
+    #    mode: '0700'
+
+    ## 再度nginxを起動
+    #- name: Start nginx
+    #  systemd: name=nginx state=started
+    #  changed_when: False

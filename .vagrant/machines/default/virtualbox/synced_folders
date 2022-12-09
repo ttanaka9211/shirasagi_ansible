@@ -1,0 +1,1 @@
+{"virtualbox":{"/data":{"owner":1002,"group":"wheel","mount_options":["dmode=775,fmode=775","uid=1002","gid=10","_netdev"],"guestpath":"/data","hostpath":"/Users/tanakatoshiyuki/Develop/vagrant","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/tanakatoshiyuki/Develop/vagrant/ansible","disabled":false,"__vagrantfile":true}}}

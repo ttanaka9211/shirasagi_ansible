@@ -1,0 +1,9 @@
+# 全てのLinuxに共通して使用するユーザ
+default_user:
+  name: wtuser
+  uid: 1002
+  group: wtuser
+  password: 
+    '$6$ivYe7PWBIwbRfp3K$OPm3CJGX6oIgJr5MVtG8m854pA.0JpNbKuQcIrGI9aNpIi7dutmXHGD3d4x0TbqZqQA7MctaknasMdZAHBY3d.'
+
+

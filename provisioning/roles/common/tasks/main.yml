@@ -1,0 +1,3 @@
+--- # 共通なタスク
+# インストールするツール
+- import_tasks: install_common_tools.yml

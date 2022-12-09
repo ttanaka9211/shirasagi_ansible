@@ -1,0 +1,12 @@
+- hosts: all
+  user: vagrant
+  # sudoをしてprovisioningを実施
+  become: yes
+  # このplaybookで実行される際の全体で使用できる変数
+  vars:
+    is_vagrant: True
+  # 実行されるロール
+  roles:
+    - common
+    - user_setup
+    - web

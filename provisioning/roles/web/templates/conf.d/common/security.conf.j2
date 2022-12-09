@@ -1,0 +1,6 @@
+# Clickjacking
+add_header X-Frame-Options SAMEORIGIN;
+# XSS Filter
+add_header X-XSS-Protection "1; mode=block";
+# IE MIME Sniffing
+add_header X-Content-Type-Options nosniff; 
