@@ -1,0 +1,58 @@
+---
+#- name: Install dependencies of asdf
+#  dnf:
+#    name:
+#        - curl
+#        - git
+#    state: present
+
+- name: "set asdf_config_file based on home directory"
+  set_fact:
+    asdf_config_file: "{{ ansible_user_dir }}/.asdfrc"
+  when: asdf_dir is undefined and asdf_config_file is undefined
+
+- name: "set asdf_default_tool_versions_file based on home directory"
+  set_fact:
+    asdf_default_tool_versions_file: "{{ ansible_user_dir }}/.tool-versions"
+  when: asdf_dir is undefined and asdf_default_tool_versions_file is undefined
+
+- name: "set asdf_dir variable based on home directory"
+  set_fact:
+    asdf_dir: "{{ ansible_user_dir }}/.asdf"
+  when: asdf_dir is undefined
+
+- name: "set asdf_default_tool_versions_file variable based on asdf_dir"
+  set_fact:
+    asdf_default_tool_versions_file: "{{ asdf_dir }}/tool-versions"
+  when: asdf_default_tool_versions_file is undefined
+
+- name: Install asdf
+  git:
+    repo: https://github.com/asdf-vm/asdf.git
+    dest: "{{ asdf_dir }}"
+    depth: 1
+  register: result
+
+- name: asdf update
+  shell: "bash -lc 'cd {{ asdf_dir }} && git pull'"
+  ignore_errors: yes
+  when: result is failed
+
+- name: set env vars
+  lineinfile:
+    dest: "{{ shrc }}"
+    state: present
+    line: "{{ item.line }}"
+  with_items:
+  - line: ". $HOME/.asdf/completions/asdf.{{ sh }}"
+    regexp: '^ \. \$HOME/\.asdf/completions/asdf\.{{ sh }}'
+  - line: '. $HOME/.asdf/asdf.sh'
+    regexp: '^ \. \$HOME/\.asdf/asdf\.sh'
+
+  #- name: "source asdf script"
+  #  template:
+  #    src: "asdf.sh.j2"
+  #    dest: "/etc/profile.d/asdf.sh"
+  #    owner: "root"
+  #    group: "root"
+  #    mode: 0755

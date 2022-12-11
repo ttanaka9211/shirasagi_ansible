@@ -1,0 +1,36 @@
+---
+- name: "install plugins"
+  shell: "bash -lc 'source {{ asdf_dir }}/asdf.sh && asdf plugin-add {{ item.name }}'"
+  args:
+    creates: "{{ asdf_dir }}/plugins/{{ item.name }}"
+  with_items: "{{ asdf_plugins }}"
+  when: asdf_plugins | length >0
+  ignore_errors: True
+
+- name: "install apps"
+  command: "bash -lc 'source {{ asdf_dir }}/asdf.sh && asdf install {{ item.0.name }} {{ item.1 }}'"
+  args:
+    creates: "{{ asdf_dir }}/installs/{{ item.0.name }}/{{ item.1 }}"
+  with_subelements:
+    - "{{ asdf_plugins }}"
+    - versions
+    - flags:
+      skip_missing: True
+  when: asdf_plugins | length > 0
+
+- name: "set global app versions"
+  #command: "bash -lc 'source {{asdf_dir}}/asdf.sh && asdf global {{ item.name }} {{ item.global | default(item.versions | difference(item.delete_versions|default([])) | sort | first) }}'"
+  command: "bash -lc 'source {{asdf_dir}}/asdf.sh && asdf global {{ item.name }} {{ item.global }}'"
+  when: item.versions is defined
+  with_items: "{{ asdf_plugins }}"
+
+- name: "uninstall apps"
+  command: "bash -lc 'source {{asdf_dir}}/asdf.sh && asdf uninstall {{ item.0.name }} {{ item.1 }}'"
+  args:
+    removes: "{{ asdf_dir }}/installs/{{ item.0.name }}/{{ item.1 }}"
+  with_subelements:
+    - "{{ asdf_plugins }}"
+    - delete_versions
+    - flags:
+      skip_missing: True
+  when: asdf_plugins | length > 0

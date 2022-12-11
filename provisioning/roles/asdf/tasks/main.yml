@@ -1,0 +1,3 @@
+---
+- import_tasks: install_asdf.yml
+- import_tasks: install_plugin.yml
