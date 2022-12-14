@@ -1,0 +1,3 @@
+--- # DBサーバのインストール
+- import_tasks: install_mongod.yml
+

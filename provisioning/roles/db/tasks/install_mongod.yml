@@ -1,0 +1,41 @@
+---
+- name: "install mongodb global dependencies with dnf"
+  dnf:
+    name: #"{{ mongodb_dnf_global_dependencies }}"
+      - "ImageMagick"
+      - "ImageMagick-devel"
+    enablerepo: 
+      - "epel"
+  retries: 5 
+  register: dnf_deps_result
+  when: ansible_os_family == "RedHat"
+
+- name: "add mongodb repo"
+  template:
+    src: templates/mongodb-org.repo.j2
+    dest: /etc/yum.repos.d/mongodb-org-{{ mongo_version }}.repo
+
+- name: "install mongodb"
+  dnf:
+    name: "mongodb-org"
+    enablerepo: "mongodb-org-{{ mongo_version}}"
+
+- name: "copy test"
+  copy:
+    src: /usr/lib/systemd/system/mongod.service
+    dest: /usr/lib/systemd/system/mongod.service.org
+    remote_src: yes
+
+- name: "add OOM option"
+  lineinfile:
+    path: /usr/lib/systemd/system/mongod.service
+    insertafter: "[Service]"
+    line: "OOMScoreAdjust=-1000"
+
+- name: "start mongod.service"
+  systemd:
+    name: mongod
+    state: started
+    daemon_reload: yes
+    enabled: yes
+

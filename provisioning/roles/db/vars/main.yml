@@ -1,0 +1,4 @@
+---
+mongo_version: 4.4
+mongo_dnf_global_dependencies: ["ImageMagick","ImageMagick-devel"]
+
