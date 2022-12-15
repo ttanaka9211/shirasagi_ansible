@@ -1,0 +1,3 @@
+--- # Webサーバのインストール
+- import_tasks: install_mecab.yml
+

@@ -1,0 +1,19 @@
+---
+- name: "get mecab source file"
+  get_url:
+    url: "{{item.url}}"
+    dest: "{{src_dir}}"
+  with_items: "{{mecab_source}}"
+
+- name: "find file tar.gz"
+  find: paths={{src_dir}} patterns="*.tar.gz"
+  register: find_files
+
+- name: "unarchive mecab source file"
+  unarchive:
+    src: "{{item.path}}"
+    dest: "{{src_dir}}"
+    remote_src: yes
+  with_items: "{{find_files.files}}"
+
+
