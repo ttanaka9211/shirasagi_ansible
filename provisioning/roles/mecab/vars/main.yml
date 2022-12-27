@@ -1,0 +1,11 @@
+---
+src_dir: "/usr/local/src"
+mecab_source:
+- name: "mecab-0.996"
+  url: "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE"
+- name: "mecab-ipadic-2.7.0-20070801"
+  url: "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7MWVlSDBCSXZMTXM"
+- name: "mecab-ruby-0.996"
+  url: "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7VUNlczBWVDZJbE0"
+- name: "mecab-ipadic-2.7.0-20070801.patch"
+  url: "https://raw.githubusercontent.com/shirasagi/shirasagi/stable/vendor/mecab/mecab-ipadic-2.7.0-20070801.patch"

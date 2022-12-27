@@ -11,3 +11,5 @@
     - user_setup
     - web
     - asdf 
+    - db
+    - mecab
